@@ -1,5 +1,5 @@
-# docker build -t zeevb053/k3d-dind:1.1 .
-# docker run --privileged -d -it --name k3d zeevb053/k3d-dind:1.1
+# docker build -t zeevb053/k3d-dind:1.2 .
+# docker run --privileged -d -it --name k3d zeevb053/k3d-dind:1.2
 # docker exec -it k3d bash
 
 FROM docker:28.5-dind
@@ -22,27 +22,34 @@ RUN apk update && apk add --no-cache \
     skopeo \
     zip \
     mount \
-    && rm -rf /var/cache/apk/*
+    jq \
+    && rm -rf /var/cache/apk/*  && \
+    cat /usr/bin/kubectl | base64 > /usr/bin/kubectl-base && rm /usr/bin/kubectl
 
 # Enable Docker daemon inside container
 # RUN mkdir -p /var/lib/docker
 
 # Install k3d
-RUN wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+RUN wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash && \
+    cat /usr/local/bin/k3d | base64 > /usr/local/bin/k3d-base && rm /usr/local/bin/k3d
 
 # ---- Install Helmify ----
 RUN curl -L https://github.com/arttor/helmify/releases/latest/download/helmify_Linux_x86_64.tar.gz \
-    | tar -xz -C /usr/local/bin && chmod +x /usr/local/bin/helmify
+    | tar -xz -C /usr/local/bin && chmod +x /usr/local/bin/helmify && \
+    cat /usr/local/bin/helmify | base64 > /usr/local/bin/helmify-base && rm /usr/local/bin/helmify
+
+    
+    
 
 # ---- Install Kustomize ----
-RUN curl -s "https://api.github.com/repos/kubernetes-sigs/kustomize/releases/latest" \
-    | grep browser_download_url \
-    | grep linux_amd64.tar.gz \
-    | cut -d '"' -f 4 \
-    | xargs curl -L -o /tmp/kustomize.tar.gz \
-    && tar -xzf /tmp/kustomize.tar.gz -C /usr/local/bin \
-    && chmod +x /usr/local/bin/kustomize \
-    && rm -f /tmp/kustomize.tar.gz
+# RUN curl -s "https://api.github.com/repos/kubernetes-sigs/kustomize/releases/latest" \
+#     | grep browser_download_url \
+#     | grep linux_amd64.tar.gz \
+#     | cut -d '"' -f 4 \
+#     | xargs curl -L -o /tmp/kustomize.tar.gz \
+#     && tar -xzf /tmp/kustomize.tar.gz -C /usr/local/bin \
+#     && chmod +x /usr/local/bin/kustomize \
+#     && rm -f /tmp/kustomize.tar.gz
 
 # Configure Flatpak and install K3x
 RUN flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo && \
