@@ -1,5 +1,5 @@
-# docker build -t zeevb053/k3d-dind:1.0 .
-# docker run --privileged -d -it --name k3d zeevb053/k3d-dind:1.0
+# docker build -t zeevb053/k3d-dind:1.1 .
+# docker run --privileged -d -it --name k3d zeevb053/k3d-dind:1.1
 # docker exec -it k3d bash
 
 FROM docker:28.5-dind
@@ -59,7 +59,13 @@ mkdir /temp  && \
 skopeo copy docker://ghcr.io/k3d-io/k3d-proxy:5.8.3 docker-archive:/temp/k3d-proxy-5.8.3.tar:ghcr.io/k3d-io/k3d-proxy:5.8.3  && \
 skopeo copy docker://ghcr.io/k3d-io/k3d-tools:5.8.3 docker-archive:/temp/k3d-tools-5.8.3.tar:ghcr.io/k3d-io/k3d-tools:5.8.3  && \
 skopeo copy docker://rancher/k3s:v1.31.5-k3s1 docker-archive:/temp/k3s-v1.31.5-k3s1.tar:rancher/k3s:v1.31.5-k3s1  && \
-skopeo copy docker://registry:3.0.0 docker-archive:/temp/registry-3.0.0.tar:registry:3.0.0
+skopeo copy docker://registry:3.0.0 docker-archive:/temp/registry-3.0.0.tar:registry:3.0.0   && \
+echo  && \
+cat /temp/k3d-proxy-5.8.3.tar | base64 > /temp/k3d-proxy-5.8.3--base  && \
+cat /temp/k3d-tools-5.8.3.tar | base64 > /temp/k3d-tools-5.8.3--base   && \
+cat /temp/k3s-v1.31.5-k3s1.tar | base64 > /temp/k3s-v1.31.5-k3s1--base   && \
+cat /temp/registry-3.0.0.tar | base64 > /temp/registry-3.0.0--base  && \
+rm -f /temp/k3d-proxy-5.8.3.tar /temp/k3d-tools-5.8.3.tar /temp/k3s-v1.31.5-k3s1.tar /temp/registry-3.0.0.tar
 
 
 # docker pull ghcr.io/k3d-io/k3d-proxy:5.8.3 && \
