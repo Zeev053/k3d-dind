@@ -1,5 +1,5 @@
-# docker build -t zeevb053/k3d-dind:1.2 .
-# docker run --privileged -d -it --name k3d zeevb053/k3d-dind:1.2
+# docker build -t zeevb053/k3d-dind:1.3 .
+# docker run --privileged -d -it --name k3d zeevb053/k3d-dind:1.3
 # docker exec -it k3d bash
 
 FROM docker:28.5-dind
@@ -24,7 +24,8 @@ RUN apk update && apk add --no-cache \
     mount \
     jq \
     && rm -rf /var/cache/apk/*  && \
-    cat /usr/bin/kubectl | base64 > /usr/bin/kubectl-base && rm /usr/bin/kubectl
+    cat /usr/bin/kubectl | base64 > /usr/bin/kubectl-base && rm /usr/bin/kubectl && \
+    cat /usr/bin/helm | base64 > /usr/bin/helm-base  && rm /usr/bin/helm
 
 # Enable Docker daemon inside container
 # RUN mkdir -p /var/lib/docker
